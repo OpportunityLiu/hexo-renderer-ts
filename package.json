@@ -1,12 +1,16 @@
 {
   "name": "hexo-renderer-ts",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "index.js",
   "repository": {
-    "type": "github",
-    "url": "https://github.com/OpportunityLiu/hexo-renderer-ts/"
+    "type": "git",
+    "url": "https://github.com/OpportunityLiu/hexo-renderer-ts.git"
   },
-  "license": "https://github.com/OpportunityLiu/hexo-renderer-ts/blob/master/LICENSE",
+  "license": "MIT",
+  "keywords": [
+    "hexo",
+    "typescript"
+  ],
   "dependencies": {
     "@types/node": "^10.7.0",
     "typescript": "^3.0.1",
