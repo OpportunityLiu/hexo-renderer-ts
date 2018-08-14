@@ -1,0 +1,17 @@
+{
+  "name": "hexo-renderer-ts",
+  "version": "1.0.0",
+  "repository": {
+    "type": "github",
+    "url": "https://github.com/OpportunityLiu/hexo-renderer-ts/"
+  },
+  "dependencies": {
+    "@types/node": "^10.7.0",
+    "typescript": "^3.0.1",
+    "underscore": "^1.8.3"
+  },
+  "description": "A hexo tag for inserting youku video in your blog.",
+  "homepage": "https://github.com/OpportunityLiu/hexo-renderer-ts/",
+  "main": "index.js",
+  "author": "Opportunity"
+}
