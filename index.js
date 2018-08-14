@@ -1,11 +1,8 @@
-var fs = require('fs'), path = require('path'), _ = require('underscore');
-var tsc = require('typescript');
-
-var filePath = path.join(__dirname, 'youku-template.ejs');
+var ts = require('typescript');
 
 function tsRenderer(data, options)
 {
-  return tsc.transpile(data.text, {}, data.path);
+  return ts.transpile(data.text, options, data.path);
 }
 
 hexo.extend.renderer.register('ts', 'js', tsRenderer, true);
