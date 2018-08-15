@@ -1,6 +1,6 @@
 {
   "name": "hexo-renderer-ts",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "index.js",
   "repository": "github:OpportunityLiu/hexo-renderer-ts",
   "license": "MIT",
