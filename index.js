@@ -1,5 +1,5 @@
-import ts from 'typescript';
-import didYouMean from 'didyoumean';
+const ts = require('typescript');
+const didYouMean = require('didyoumean');
 
 /**
  * 
@@ -33,6 +33,7 @@ function tsRenderer(data, options)
       return;
     }
     const valueStr = String(value).trim().toLowerCase();
+    const keys = Object.getOwnPropertyNames(map);
     for (const key in map)
     {
       const val = map[key];
@@ -43,7 +44,7 @@ function tsRenderer(data, options)
     if (v === undefined)
     {
       const match = didYouMean(valueStr, Object.getOwnPropertyNames(map));
-      throw new Error(`Invalid value '${value}' of '${name}'.${match !== null ? `Did you mean: '${match}'?` : ''}`);
+      throw new Error(`Invalid value '${value}' of property '${name}'. ${match !== null ? `Did you mean: '${match}'?` : `Accepted values: ${keys.map(str => `'${str}'`).join(', ')}.`}`);
     }
     option[name] = v;
     return;
