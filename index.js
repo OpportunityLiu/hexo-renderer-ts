@@ -1,24 +1,55 @@
-var ts = require('typescript');
+import ts from 'typescript';
+import didYouMean from 'didyoumean';
 
-function setEnum(value, map)
-{
-  if (typeof value === 'number')
-    return value;
-  if (!value)
-    return undefined;
-  const valueStr = String(value).trim().toLowerCase();
-  for (const key in map)
-    map[key.toLowerCase()] = map[key];
-  return map[valueStr];
-}
-
+/**
+ * 
+ * @param {{text:string, path:string}} data 
+ * @param {ts.CompilerOptions} options
+ */
 function tsRenderer(data, options)
 {
+  /**
+   * @type {ts.CompilerOptions}
+   */
   var fileOptions = undefined;
   if (hexo.config && hexo.config.render && typeof hexo.config.render.ts === 'object')
     fileOptions = hexo.config.render.ts;
+  /**
+   * @type {ts.CompilerOptions}
+   */
   var option = { ...fileOptions, ...options };
-  option.module = setEnum(option.module, {
+
+  /**
+   * 
+   * @param {string} name 
+   * @param {{[key: string]:number}} map 
+   */
+  function setEnum(name, map)
+  {
+    var value = option[name];
+    if (value === undefined || value === null)
+    {
+      delete option[name];
+      return;
+    }
+    const valueStr = String(value).trim().toLowerCase();
+    for (const key in map)
+    {
+      const val = map[key];
+      map[map[key]] = val;
+      map[key.toLowerCase()] = val;
+    }
+    var v = map[valueStr];
+    if (v === undefined)
+    {
+      const match = didYouMean(valueStr, Object.getOwnPropertyNames(map));
+      throw new Error(`Invalid value '${value}' of '${name}'.${match !== null ? `Did you mean: '${match}'?` : ''}`);
+    }
+    option[name] = v;
+    return;
+  }
+
+  setEnum('module', {
     None: 0,
     CommonJS: 1,
     AMD: 2,
@@ -27,17 +58,19 @@ function tsRenderer(data, options)
     ES2015: 5,
     ESNext: 6
   });
-  option.moduleResolution = setEnum(option.moduleResolution, {
+  setEnum('moduleResolution', {
     Classic: 1,
     NodeJs: 2
   });
-  option.newLine = setEnum(option.newLine, {
+  setEnum('newLine', {
     CarriageReturnLineFeed: 0,
     LineFeed: 1,
+    CrLf: 0,
+    Lf: 1,
     '\r\n': 0,
     '\r': 1
   });
-  option.target = setEnum(option.target, {
+  setEnum('target', {
     ES3: 0,
     ES5: 1,
     ES2015: 2,
@@ -48,7 +81,14 @@ function tsRenderer(data, options)
     JSON: 100,
     Latest: 6
   });
+  setEnum('jsx', {
+    None: 0,
+    Preserve: 1,
+    React: 2,
+    ReactNative: 3
+  });
   return ts.transpile(data.text, option, data.path);
 }
 
 hexo.extend.renderer.register('ts', 'js', tsRenderer, true);
+hexo.extend.renderer.register('tsx', 'js', tsRenderer, true);
