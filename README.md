@@ -13,7 +13,11 @@ render:
     newLine: Lf
     pretty: false
 ```
-
+Or from `tsconfig.json` file
+```yaml
+render:
+  ts: tsconfig.json # path to tsconfig.json file
+```
 Or by API:
 ```javascript
 hexo.render.render({text: '', engine: 'ts'}, {
