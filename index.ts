@@ -1,5 +1,4 @@
-import * as ts from 'typescript';
-/// <reference path="didyoumean.d.ts"/>
+import ts = require('typescript');
 import didYouMean = require('didyoumean');
 
 didYouMean.caseSensitive = false;
@@ -15,7 +14,7 @@ declare const hexo: {
     extend: {
         renderer: {
             register(source: string, target: string, renderer: (data: HexoRendererData, options: any) => string, sync: true): void;
-            register(source: string, target: string, renderer: (data: HexoRendererData, options: any, callback: Function) => void, sync: false): void;
+            register(source: string, target: string, renderer: (data: HexoRendererData, options: any) => Promise<string>, sync: false): void;
         }
     }
 };

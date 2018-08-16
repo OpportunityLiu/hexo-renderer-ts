@@ -7,5 +7,8 @@
         "noEmitOnError": true,
         "removeComments": true,
         "pretty": false
+    },
+    "typeAcquisition": {
+        "enable": true
     }
 }
