@@ -1,0 +1,11 @@
+﻿{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "alwaysStrict": true,
+        "strict": true,
+        "noEmitOnError": true,
+        "removeComments": true,
+        "pretty": false
+    }
+}
