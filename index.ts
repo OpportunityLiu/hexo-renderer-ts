@@ -40,6 +40,7 @@ function tsRenderer(data: HexoRendererData, options: ts.CompilerOptions)
 {
     const fileOptions = hexo && hexo.config && hexo.config.render && hexo.config.render.ts;
     const option: ts.CompilerOptions = { ...fileOptions, ...options };
+    option.strict
 
     function setEnum(name: keyof ts.CompilerOptions, map: any)
     {
@@ -83,7 +84,11 @@ function tsRenderer(data: HexoRendererData, options: ts.CompilerOptions)
     });
     setEnum('target', ts.ScriptTarget);
     setEnum('jsx', ts.JsxEmit);
-    return ts.transpile(data.text, option, data.path);
+    const result = ts.transpileModule(data.text, { compilerOptions: option, fileName: data.path, reportDiagnostics: true });
+    if (result.diagnostics)
+        for (const diag of result.diagnostics)
+            console.log(diag)
+    return result.outputText;
 }
 
 hexo.extend.renderer.register('ts', 'js', tsRenderer, true);
