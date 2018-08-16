@@ -7,13 +7,16 @@ See <https://www.typescriptlang.org/docs/handbook/compiler-options.html>
 In `_config.yml`:
 ```yaml
 render:
-  ts: 
-    module: None
+  ts:
+    target: ES2015
+    removeComments: true
+    newLine: Lf
+    pretty: false
 ```
 
 Or by API:
 ```js
-hexo.render.render({text: '', engine: 'ts'}, {module: 'None'}).then(function(result){
+hexo.render.render({text: '', engine: 'ts'}, {target: 'ES2015', removeComments: true, newLine: 'Lf', pretty: false}).then(function(result){
   // ...
 });
 ```
