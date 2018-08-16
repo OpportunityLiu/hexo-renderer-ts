@@ -56,11 +56,10 @@ function tsRenderer(data: HexoRendererData, options: ts.CompilerOptions)
         for (const key in enumMap)
         {
             const val = enumMap[key];
-            if (val)
-            {
-                myMap[key.toLowerCase()] = val;
-                myMap[val.toString()] = val;
-            }
+            if (val === undefined)
+                continue;
+            myMap[key.toLowerCase()] = val;
+            myMap[val.toString()] = val;
         }
         var v = myMap[valueStr];
         if (v === undefined)
