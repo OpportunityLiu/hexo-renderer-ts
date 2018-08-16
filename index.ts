@@ -40,7 +40,6 @@ function tsRenderer(data: HexoRendererData, options: ts.CompilerOptions)
 {
     const fileOptions = hexo && hexo.config && hexo.config.render && hexo.config.render.ts;
     const option: ts.CompilerOptions = { ...fileOptions, ...options };
-    option.strict
 
     function setEnum(name: keyof ts.CompilerOptions, map: any)
     {
