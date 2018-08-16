@@ -15,8 +15,12 @@ render:
 ```
 
 Or by API:
-```js
-hexo.render.render({text: '', engine: 'ts'}, {target: 'ES2015', removeComments: true, newLine: 'Lf', pretty: false}).then(function(result){
+```javascript
+hexo.render.render({text: '', engine: 'ts'}, {
+  target: 'ES2015',
+  removeComments: true, 
+  newLine: 'Lf', 
+  pretty: false}).then(function(result){
   // ...
 });
 ```
