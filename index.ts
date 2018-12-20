@@ -1,5 +1,7 @@
-import ts = require('typescript');
-import os = require('os');
+import * as ts from 'typescript';
+import * as os from 'os';
+import * as fs from 'fs';
+import * as path from 'path';
 
 interface HexoRendererData
 {
@@ -22,22 +24,26 @@ declare const hexo: {
             register(source: string, target: string, renderer: (data: HexoRendererData, options: any) => string, sync: true): void;
             register(source: string, target: string, renderer: (data: HexoRendererData, options: any) => Promise<string>, sync: false): void;
         }
-    }
+    },
+    log: any
 };
 
 function reportDiagnostics(diagnostics?: ts.Diagnostic[])
 {
     if (!diagnostics)
         return;
-    diagnostics.forEach(d => console.error(
-        "Error",
-        d.code,
-        ":",
-        ts.flattenDiagnosticMessageText(d.messageText, os.EOL)
-    ));
+    diagnostics.forEach(diagnostic =>
+    {
+        let message = ts.formatDiagnostic(diagnostic, {
+            getCurrentDirectory: () => hexo.base_dir,
+            getNewLine: () => os.EOL,
+            getCanonicalFileName: (fileName) => path.normalize(fileName)
+        })
+        hexo.log.error(message.trim());
+    });
 }
 
-function getCompileOption(options: any)
+function getCompileOption(options: any): ts.CompilerOptions
 {
     const config = hexo && hexo.config && hexo.config.render && hexo.config.render.ts;
     const defaultOptions = ts.getDefaultCompilerOptions();
@@ -68,15 +74,62 @@ function getCompileOption(options: any)
     }
     const mergedOptions: ts.CompilerOptions = { ...defaultOptions, ...fileOptions, ...argOptions };
 
+    // transpileModule does not write anything to disk so there is no need to verify that there are no conflicts between input and output paths.
+    mergedOptions.suppressOutputPathCheck = true;
+    // Filename can be non-ts file.
+    mergedOptions.allowNonTsExtensions = true;
+    // We are not doing a full typecheck, we are not resolving the whole context,
+    // so pass --noResolve to avoid reporting missing file errors.
+    mergedOptions.noResolve = true;
+
     return mergedOptions;
 }
 
-function tsRenderer(data: HexoRendererData, options: any)
+function tsRenderer(data: HexoRendererData, hexoOptions: any): string
 {
-    const option = getCompileOption(options);
-    const result = ts.transpileModule(data.text, { compilerOptions: option, fileName: data.path, reportDiagnostics: true });
-    reportDiagnostics(result.diagnostics);
-    return result.outputText;
+    const options = getCompileOption(hexoOptions);
+
+    // if jsx is specified then treat file as .tsx
+    const inputFileName = data.path || (options.jsx ? "module.tsx" : "module.ts");
+    const sourceFile = ts.createSourceFile(inputFileName, data.text, options.target!);
+
+    // Output
+    let outputText: string | undefined;
+    let sourceMapText: string | undefined;
+    const defHost = ts.createCompilerHost(options);
+    // Create a compilerHost object to allow the compiler to read and write files
+    const compilerHost: ts.CompilerHost = {
+        ...defHost,
+        getSourceFile: (fileName, langVersion, onError, shouldCreateNewSourceFile) =>
+        {
+            return fileName === path.normalize(inputFileName) ? sourceFile : defHost.getSourceFile(fileName, langVersion, onError, shouldCreateNewSourceFile)
+        },
+        writeFile: (name, text) =>
+        {
+            if (path.extname(name) === ".map")
+            {
+                sourceMapText = text;
+            }
+            else
+            {
+                outputText = text;
+            }
+        },
+        useCaseSensitiveFileNames: () => false,
+        getCanonicalFileName: fileName => fileName,
+        getCurrentDirectory: () => hexo.base_dir,
+        fileExists: (fileName): boolean => fileName === inputFileName || defHost.fileExists(fileName),
+    };
+
+    const program = ts.createProgram([inputFileName], options, compilerHost);
+    // Emit
+    const emitResult = program.emit();
+
+    const allDiagnostics = ts
+        .getPreEmitDiagnostics(program)
+        .concat(emitResult.diagnostics);
+    reportDiagnostics(allDiagnostics);
+    return outputText || "";
 }
 
 hexo.extend.renderer.register('ts', 'js', tsRenderer, true);

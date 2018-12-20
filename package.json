@@ -1,6 +1,6 @@
 {
   "name": "hexo-renderer-ts",
-  "version": "1.2.0",
+  "version": "1.2.5",
   "main": "index.js",
   "repository": "github:OpportunityLiu/hexo-renderer-ts",
   "license": "MIT",
@@ -11,14 +11,14 @@
     "tsx"
   ],
   "dependencies": {
-    "hexo": "^3.7.1",
-    "typescript": "^3.0.1"
+    "hexo": "^3.8.0",
+    "typescript": "^3.2.2"
   },
   "devDependencies": {
-    "@types/node": "^10.7.0"
+    "@types/node": "^10.12.15"
   },
   "scripts": {
-    "prepublish": "tsc"
+    "prepare": "tsc"
   },
   "description": "Hexo renderer for typescript files.",
   "homepage": "https://github.com/OpportunityLiu/hexo-renderer-ts/",
